@@ -294,7 +294,18 @@ class Client
       msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
       @_cleanUp()
-      errorCallback?(msg)
+      frame =
+        command: 'CLOSE'
+        headers:
+          message: msg
+      errorCallback?(frame)
+    @ws.onerror = (error) =>
+      @debug?(error)
+      frame =
+        command: 'ERROR'
+        headers:
+          message: error.message
+      errorCallback?(frame)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       headers["accept-version"] = Stomp.VERSIONS.supportedVersions()
