@@ -290,15 +290,15 @@ class Client
             errorCallback?(frame)
           else
             @debug? "Unhandled frame: #{frame}"
-    @ws.onclose   = =>
+    @ws.onclose = (had_error) =>
       msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
       @_cleanUp()
       frame =
-        command: 'CLOSE'
+        command: 'ERROR'
         headers:
           message: msg
-      errorCallback?(frame)
+      errorCallback?(frame, had_error)
     @ws.onerror = (error) =>
       @debug?(error)
       frame =
