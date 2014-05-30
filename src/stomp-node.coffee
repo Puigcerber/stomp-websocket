@@ -36,11 +36,21 @@ wrapTCP = (port, host) ->
   socket = net.connect port, host, (e) -> ws.onopen()
   socket.on 'error', (e) -> ws.onclose?(e)
   socket.on 'close', (e) -> ws.onclose?(e)
+  buffer = ''
   socket.on 'data', (data) ->
-    event = {
-      'data': data.toString()
-    }
-    ws.onmessage(event)
+    buffer += data
+
+    # split on frames by the null byte optionally followed by newlines
+    frames = buffer.split(/\0\n?/)
+    return if frames.length is 1
+
+    # keep the last partial frame buffered
+    buffer = frames.pop()
+
+    while frame = frames.shift()
+      event = data: frame
+      ws.onmessage(event)
+    return
 
   return ws
 
