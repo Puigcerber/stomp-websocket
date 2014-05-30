@@ -41,7 +41,7 @@ wrapTCP = (port, host) ->
     buffer += data
 
     # split on frames by the null byte optionally followed by newlines
-    frames = buffer.split(/\0\n?/)
+    frames = buffer.split(/\0\n*/)
     return if frames.length is 1
 
     # keep the last partial frame buffered
